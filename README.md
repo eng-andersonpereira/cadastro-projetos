@@ -7,6 +7,8 @@ Sistema web para controlar a produção de projetos de rede elétrica rural: cad
 
 🔗 **Demo:** https://cadastro-projetos.vercel.app
 
+> Ao abrir o link pela primeira vez, clique em **“Ver demonstração com dados de exemplo”** para ver o sistema funcionando com dados fictícios.
+
 ![Visão geral](docs/visao-geral.png)
 
 ## O problema
@@ -24,6 +26,7 @@ Cada projeto chega como um arquivo `.zip` e precisa ser entregue com uma mensage
 - **Controle diário** em tabela, exportável para Excel (CSV).
 - **Importar mensagens antigas:** cole várias mensagens de entrega e o app reconstrói o histórico.
 - **Backup:** arquivo `.json` ou texto copiado, com lembrete quando passa um dia sem backup.
+- **Modo demonstração:** um botão carrega dados fictícios para conhecer o sistema sem cadastrar nada.
 - **Mascote animado:** um trabalhador que dança quando a produção está no ritmo e fica triste quando está atrasada. 👷
 
 | No ritmo | Atrasado |

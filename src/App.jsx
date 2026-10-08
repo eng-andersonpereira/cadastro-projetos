@@ -500,6 +500,21 @@ const Aviso = styled.div`
   margin-bottom: 16px;
   font-weight: 600;
 `
+const AvisoDemo = styled.div`
+  background: #eff6ff;
+  border: 1px solid #93c5fd;
+  color: #1e3a8a;
+  border-radius: 12px;
+  padding: 11px 14px;
+  margin-bottom: 16px;
+  font-weight: 600;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+`
+
 const ItemProjeto = styled.article`
   background: #fff;
   border-radius: 14px;
@@ -594,6 +609,45 @@ function extensaoValida(texto) {
 
 const mesAtual = hoje().slice(0, 7)
 
+function gerarDemonstracao() {
+  const padrao = [20, 15, 24, 9, 31, 30, 18, 22, 12, 27, 16, 25, 14, 28]
+  const diaAtual = new Date().getDate()
+  const lista = []
+  let contador = 0
+
+  for (let dia = 1; dia <= diaAtual; dia++) {
+    const total = padrao[(dia - 1) % padrao.length]
+    const partes =
+      total >= 18 ? [Math.ceil(total / 2), Math.floor(total / 2)] : [total]
+
+    partes.forEach((postes) => {
+      contador += 1
+      lista.push({
+        ss: `100000${String(contador).padStart(3, '0')}${
+          contador % 5 === 0 ? '-EX' : ''
+        }`,
+        nota: `4301000${String(contador).padStart(2, '0')}`,
+        status: 'finalizado',
+        postes,
+        extensao: `0,${200 + ((contador * 37) % 600)}`,
+        licencaAmbiental: contador % 3 === 0,
+        dataEntrega: `${mesAtual}-${String(dia).padStart(2, '0')}`,
+        demo: true,
+      })
+    })
+  }
+
+  lista.push({ ss: '100000990', nota: '430100990', status: 'pendente', demo: true })
+  lista.push({ ss: '100000991-EX', nota: '430100991', status: 'pendente', demo: true })
+
+  const total = lista
+    .filter((p) => p.status === 'finalizado')
+    .reduce((soma, p) => soma + p.postes, 0)
+  const meta = Math.round((total / diaAtual) * diasDoMes(mesAtual) * 0.8 / 10) * 10
+
+  return { projetos: lista, meta: String(meta), valor: '10' }
+}
+
 function App() {
   const [ss, setSs] = useState('')
   const [nota, setNota] = useState('')
@@ -650,6 +704,19 @@ function App() {
   useEffect(() => {
     localStorage.setItem('usuario', usuario)
   }, [usuario])
+
+  function carregarDemonstracao() {
+    const demo = gerarDemonstracao()
+    setProjetos(demo.projetos)
+    setMetas({ ...metas, [mesAtual]: { meta: demo.meta, valor: demo.valor } })
+    setMesSel(mesAtual)
+  }
+
+  function limparDemonstracao() {
+    const restantes = projetos.filter((p) => !p.demo)
+    setProjetos(restantes)
+    if (restantes.length === 0) setMetas({})
+  }
 
   function trocarNome() {
     const novo = window.prompt('Qual é o seu nome?', usuario)
@@ -1117,7 +1184,9 @@ function App() {
     ? Math.floor((new Date(hoje()) - new Date(ultimoBackup)) / 86400000)
     : null
   const precisaBackup =
-    projetos.length > 0 && (diasSemBackup === null || diasSemBackup >= 1)
+    projetos.length > 0 &&
+    !projetos.every((p) => p.demo) &&
+    (diasSemBackup === null || diasSemBackup >= 1)
 
   const termo = busca.trim().toLowerCase()
   const qtdPendentes = projetos.filter((p) => p.status === 'pendente').length
@@ -1137,7 +1206,9 @@ function App() {
 
   const adiantado = totalPostes - metaAcumulada
   const pct = metaNum > 0 ? Math.round((totalPostes / metaNum) * 100) : 0
-  const corSituacao = noRitmo ? '#16a34a' : '#dc2626'
+  const corSituacao =
+    metaNum <= 0 ? '#94a3b8' : noRitmo ? '#16a34a' : '#dc2626'
+  const emDemo = projetos.some((p) => p.demo)
 
   const hora = new Date().getHours()
   const saudacao = hora < 12 ? 'Bom dia' : hora < 18 ? 'Boa tarde' : 'Boa noite'
@@ -1236,6 +1307,32 @@ function App() {
               : `Último backup há ${diasSemBackup} dia(s).`}{' '}
             Baixe um agora no cartão Backup, lá embaixo.
           </Aviso>
+        )}
+
+        {emDemo && (
+          <AvisoDemo>
+            <span>
+              🎬 Modo demonstração: todos os dados abaixo são fictícios.
+            </span>
+            <Botao onClick={limparDemonstracao}>Limpar demonstração</Botao>
+          </AvisoDemo>
+        )}
+
+        {projetos.length === 0 && (
+          <Cartao>
+            <Secao>👋 Bem-vindo!</Secao>
+            <p style={{ marginTop: 0 }}>
+              Este sistema controla a produção de projetos de rede rural: cadastra,
+              dá baixa, gera a mensagem de entrega e acompanha a meta do mês. Os
+              dados ficam <strong>apenas no seu navegador</strong>.
+            </p>
+            <Linha>
+              <Botao $tipo="primario" onClick={carregarDemonstracao}>
+                ▶ Ver demonstração com dados de exemplo
+              </Botao>
+              <span>ou comece cadastrando no cartão “Novo projeto”.</span>
+            </Linha>
+          </Cartao>
         )}
 
         <Grade>
