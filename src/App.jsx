@@ -5,6 +5,7 @@ import { lerNomeZip } from './zips.js'
 import { lerMensagens } from './mensagens.js'
 import Mascote from './Mascote.jsx'
 import BoasVindas from './BoasVindas.jsx'
+import Kpis from './Kpis.jsx'
 import {
   gerarMensagem,
   copiar,
@@ -43,12 +44,6 @@ import {
   Usuario,
   Avatar,
   Grade,
-  Kpi,
-  KpiRotulo,
-  KpiValor,
-  KpiNota,
-  Barra,
-  Preenchimento,
   Cartao,
   Secao,
   SubSecao,
@@ -67,7 +62,6 @@ import {
   Detalhes,
 } from './estilos.js'
 import {
-  Anel,
   GraficoAcumulado,
   GraficoDiario,
   GraficoMeses,
@@ -554,13 +548,6 @@ function App() {
   const diasRestantes = totalDias - diaRef
   const porDia = diasRestantes > 0 ? Math.ceil(falta / diasRestantes) : falta
   const noRitmo = totalPostes >= metaAcumulada
-  const situacao = mesPassado
-    ? noRitmo
-      ? 'META BATIDA'
-      : 'META NÃO BATIDA'
-    : noRitmo
-      ? 'NO RITMO'
-      : 'ATRASADO'
 
   const controle = montarControle(
     finalizadosDoMes,
@@ -630,9 +617,6 @@ function App() {
     .filter((p) => p.ss.toLowerCase().includes(termo) || p.nota.includes(termo))
 
   const adiantado = totalPostes - metaAcumulada
-  const pct = metaNum > 0 ? Math.round((totalPostes / metaNum) * 100) : 0
-  const corSituacao =
-    metaNum <= 0 ? '#94a3b8' : noRitmo ? '#16a34a' : '#dc2626'
   const emDemo = projetos.some((p) => p.demo)
 
   const hora = new Date().getHours()
@@ -745,73 +729,20 @@ function App() {
 
         {projetos.length === 0 && <BoasVindas aoVerDemo={carregarDemonstracao} />}
 
-        <Grade>
-          <Kpi $cor="#2563eb">
-            <div style={{ flex: 1 }}>
-              <KpiRotulo>Postes no mês</KpiRotulo>
-              <KpiValor>{totalPostes}</KpiValor>
-              <KpiNota>
-                {metaNum > 0 ? `de ${metaNum} da meta` : 'defina a meta acima'} ·{' '}
-                {finalizadosDoMes.length} projetos
-              </KpiNota>
-              {metaNum > 0 && (
-                <Barra>
-                  <Preenchimento
-                    $cor="linear-gradient(90deg, #38bdf8, #2563eb)"
-                    style={{ width: `${Math.min(pct, 100)}%` }}
-                  />
-                </Barra>
-              )}
-            </div>
-            {metaNum > 0 && <Anel percentual={pct} cor="#2563eb" />}
-          </Kpi>
-
-          <Kpi $cor="#16a34a" $atraso={80}>
-            <div>
-              <KpiRotulo>Valor no mês</KpiRotulo>
-              <KpiValor>{dinheiro(totalValor)}</KpiValor>
-              <KpiNota>
-                {Number(valorDoMes) > 0
-                  ? `${dinheiro(Number(valorDoMes))} por poste`
-                  : 'defina o valor por poste'}
-              </KpiNota>
-            </div>
-          </Kpi>
-
-          <Kpi $cor={corSituacao} $atraso={160}>
-            <div>
-              <KpiRotulo>Situação</KpiRotulo>
-              <div style={{ margin: '8px 0' }}>
-                <Selo $cor={corSituacao} style={{ fontSize: 15, padding: '5px 14px' }}>
-                  {metaNum > 0 ? situacao : 'SEM META'}
-                </Selo>
-              </div>
-              <KpiNota>
-                {metaNum > 0
-                  ? `Meta acumulada ${metaAcumulada} · ${
-                      adiantado >= 0
-                        ? `${adiantado} à frente`
-                        : `${Math.abs(adiantado)} atrás`
-                    }`
-                  : 'informe a meta do mês'}
-              </KpiNota>
-            </div>
-          </Kpi>
-
-          <Kpi $cor="#f59e0b" $atraso={240}>
-            <div>
-              <KpiRotulo>Falta para a meta</KpiRotulo>
-              <KpiValor>{metaNum > 0 ? falta : '-'}</KpiValor>
-              <KpiNota>
-                {metaNum > 0 && !mesPassado
-                  ? `Precisa de ${porDia}/dia · ${diasRestantes} dias restantes`
-                  : metaNum > 0
-                    ? 'mês encerrado'
-                    : 'informe a meta do mês'}
-              </KpiNota>
-            </div>
-          </Kpi>
-        </Grade>
+        <Kpis
+          totalPostes={totalPostes}
+          metaNum={metaNum}
+          qtdProjetos={finalizadosDoMes.length}
+          totalValor={totalValor}
+          valorPoste={Number(valorDoMes)}
+          metaAcumulada={metaAcumulada}
+          adiantado={adiantado}
+          falta={falta}
+          porDia={porDia}
+          diasRestantes={diasRestantes}
+          mesPassado={mesPassado}
+          noRitmo={noRitmo}
+        />
 
         <Grade $min={420}>
           <Cartao>
