@@ -126,7 +126,7 @@ export function Anel({ percentual, cor, tamanho = 84 }) {
 
   return (
     <svg width={tamanho} height={tamanho} viewBox="0 0 84 84" role="img">
-      <title>{percentual}% da meta</title>
+      <title>{`${percentual}% da meta`}</title>
       <circle cx="42" cy="42" r={raio} fill="none" stroke="#e2e8f0" strokeWidth="9" />
       <circle
         cx="42"
