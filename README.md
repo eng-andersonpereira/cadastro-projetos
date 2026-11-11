@@ -72,13 +72,17 @@ npm run build
 
 ```
 src/
-├── App.jsx        # telas e estado da aplicação
-├── Graficos.jsx   # gráficos em SVG
-├── Mascote.jsx    # trabalhador animado
-├── controle.js    # cálculo do controle diário e da meta
-├── exportar.js    # exportação para Excel (CSV)
-├── mensagens.js   # leitura de mensagens de entrega antigas
-└── zips.js        # leitura do nome do arquivo zip
+├── App.jsx          # telas e estado da aplicação
+├── BoasVindas.jsx   # tela de boas-vindas
+├── Kpis.jsx         # cartões de resumo do mês (só exibe os números)
+├── Graficos.jsx     # gráficos em SVG
+├── Mascote.jsx      # trabalhador animado
+├── controle.js      # cálculo do controle diário e da meta
+├── estilos.js       # componentes de estilo compartilhados (styled-components)
+├── exportar.js      # exportação para Excel (CSV)
+├── mensagens.js     # leitura de mensagens de entrega antigas
+├── utilidades.js    # funções auxiliares, como formatar dinheiro
+└── zips.js          # leitura do nome do arquivo zip
 ```
 
 ## Privacidade
